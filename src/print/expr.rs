@@ -9,6 +9,7 @@ use crate::{
 impl<'a, 'b> Printer<'a, 'b> {
     pub fn print_expr(&mut self, expr: Expr, indent_level: usize) {
         let span = expr.span();
+        let is_macro = matches!(expr, Expr::Macro(_));
         let lines: Vec<String> = match std::panic::catch_unwind(|| match expr {
             Expr::Block(expr_block) => {
                 unparse_stmts(&expr_block.block.stmts, self.base_indent + indent_level)
@@ -30,6 +31,14 @@ impl<'a, 'b> Printer<'a, 'b> {
         match lines.len() {
             0 => (),
             1 => self.write(lines[0].trim()),
+            // macro calls (e.g. `format!(r#"..."#)`) stay unwrapped even when multi-line
+            _ if is_macro => {
+                self.write(lines[0].trim());
+                for line in &lines[1..] {
+                    self.write("\n");
+                    self.write(line);
+                }
+            }
             _ => {
                 self.write("{\n");
                 self.write(&lines.join("\n"));
