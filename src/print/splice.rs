@@ -66,12 +66,31 @@ mod test {
         r##"
         html! {
             script type="text/javascript" {
-                (format!(
-                    r#"
+                (format!(r#"
                     console.log({});
-                "#,
-                    x
-                ))
+                "#, x))
+            }
+        }
+        "##
+    );
+
+    test_default!(
+        splice_multiline_macro_messy_indent,
+        r##"
+        html! {
+        script type="text/javascript" {
+        (format!(r#"
+                    console.log({});
+                "#, x))
+        }
+        }
+        "##,
+        r##"
+        html! {
+            script type="text/javascript" {
+                (format!(r#"
+                    console.log({});
+                "#, x))
             }
         }
         "##

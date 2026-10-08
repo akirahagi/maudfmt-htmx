@@ -14,6 +14,9 @@ impl<'a, 'b> Printer<'a, 'b> {
             Expr::Block(expr_block) => {
                 unparse_stmts(&expr_block.block.stmts, self.base_indent + indent_level)
             }
+            Expr::Macro(_) if self.base_indent + indent_level > 0 => {
+                unparse_expr(&expr, self.base_indent + indent_level - 1)
+            }
             _ => unparse_expr(&expr, self.base_indent + indent_level),
         }) {
             Ok(lines) => lines,
@@ -32,7 +35,7 @@ impl<'a, 'b> Printer<'a, 'b> {
             0 => (),
             1 => self.write(lines[0].trim()),
             // macro calls (e.g. `format!(r#"..."#)`) stay unwrapped even when multi-line
-            _ if is_macro => {
+            _ if is_macro && self.base_indent + indent_level > 0 => {
                 self.write(lines[0].trim());
                 for line in &lines[1..] {
                     self.write("\n");
