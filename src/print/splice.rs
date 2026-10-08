@@ -53,6 +53,50 @@ mod test {
     );
 
     test_default!(
+        splice_multiline_macro_not_wrapped,
+        r##"
+        html! {
+            script type="text/javascript" {
+                (format!(r#"
+                    console.log({});
+                "#, x))
+            }
+        }
+        "##,
+        r##"
+        html! {
+            script type="text/javascript" {
+                (format!(r#"
+                    console.log({});
+                "#, x))
+            }
+        }
+        "##
+    );
+
+    test_default!(
+        splice_multiline_macro_messy_indent,
+        r##"
+        html! {
+        script type="text/javascript" {
+        (format!(r#"
+                    console.log({});
+                "#, x))
+        }
+        }
+        "##,
+        r##"
+        html! {
+            script type="text/javascript" {
+                (format!(r#"
+                    console.log({});
+                "#, x))
+            }
+        }
+        "##
+    );
+
+    test_default!(
         doctype,
         r#"
         use maud::DOCTYPE;
